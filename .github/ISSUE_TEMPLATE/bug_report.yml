@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug with the OpenWrt Home Assistant integration
+description: Report a bug with the FinTS Banking Home Assistant integration
 title: '[Bug]: '
 labels: ['bug', 'triage']
 assignees:
@@ -9,16 +9,16 @@ body:
     attributes:
       value: |
         ## Before submitting
-        - 🔍 Search [existing issues](https://github.com/FaserF/ha-openwrt/issues) to avoid duplicates
-        - 📖 Check the [Documentation Site](https://faserf.github.io/ha-openwrt/)
-        - 🔗 View the integration: [![Open your Home Assistant instance and show the openwrt integration.](https://my.home-assistant.io/badges/integration.svg)](https://my.home-assistant.io/redirect/integration/?domain=openwrt)
+        - 🔍 Search [existing issues](https://github.com/FaserF/ha-fints/issues) to avoid duplicates
+        - 🔗 View the integration: [![Open your Home Assistant instance and show the fints integration.](https://my.home-assistant.io/badges/integration.svg)](https://my.home-assistant.io/redirect/integration/?domain=fints)
+        - ⚠️ **SECURITY REMINDER**: Never post your banking PIN, login credentials, or full unmasked IBANs!
 
   - type: input
     id: integration_version
     attributes:
       label: Integration Version
-      description: Which version of ha-openwrt are you running? (HACS or integration page)
-      placeholder: e.g. v2.5.3
+      description: Which version of ha-fints are you running?
+      placeholder: e.g. v1.0.0
     validations:
       required: true
 
@@ -47,34 +47,28 @@ body:
       required: true
 
   - type: input
-    id: openwrt_version
+    id: bank_name_blz
     attributes:
-      label: OpenWrt Version
-      description: Which version of OpenWrt is running on your router?
-      placeholder: e.g. 25.12.5
+      label: Bank Name / BLZ
+      description: What bank institution are you connecting to? (e.g. Sparkasse KölnBonn, DKB, ING, Volksbank)
+      placeholder: e.g. DKB (BLZ 12030000)
     validations:
       required: true
-
-  - type: input
-    id: router_model
-    attributes:
-      label: Router Model
-      description: What router model are you using? (optional but helpful)
-      placeholder: e.g. Linksys WRT3200ACM, GL.iNet GL-MT6000
-    validations:
-      required: false
 
   - type: dropdown
-    id: connection_method
+    id: tan_method
     attributes:
-      label: Connection Method
-      description: How is Home Assistant connecting to OpenWrt?
+      label: TAN / 2FA Method
+      description: Which TAN or second-factor method does your bank account use?
       options:
-        - ubus (HTTP/HTTPS)
-        - LuCI RPC
-        - SSH
+        - PushTAN / Banking App
+        - photoTAN
+        - ChipTAN / Sm@rt-TAN
+        - BestSign
+        - None / Decoupled
+        - Other / Unknown
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: description
@@ -90,9 +84,9 @@ body:
       label: Steps to Reproduce
       description: Step-by-step instructions to reproduce the behavior.
       placeholder: |
-        1. Configure integration with '...'
-        2. Navigate to '...'
-        3. See error / unexpected behavior
+        1. Add integration with '...'
+        2. Wait for poll interval / click sync button
+        3. See error in logs / sensors unavailable
     validations:
       required: false
 
@@ -107,10 +101,10 @@ body:
   - type: textarea
     id: diagnostics
     attributes:
-      label: Diagnostics
+      label: Diagnostics (Masked)
       description: |
-        Download diagnostics from the integration page and paste here (very helpful!):
-        [![Open your Home Assistant instance and show the openwrt integration.](https://my.home-assistant.io/badges/integration.svg)](https://my.home-assistant.io/redirect/integration/?domain=openwrt)
+        Download diagnostics from the integration page and paste here (sensitive credentials are automatically redacted):
+        [![Open your Home Assistant instance and show the fints integration.](https://my.home-assistant.io/badges/integration.svg)](https://my.home-assistant.io/redirect/integration/?domain=fints)
       render: json
     validations:
       required: false
@@ -126,7 +120,7 @@ body:
         logger:
           default: warning
           logs:
-            custom_components.openwrt: debug
+            custom_components.fints: debug
         ```
       render: shell
     validations:

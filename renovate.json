@@ -22,15 +22,5 @@
   ],
   "github-actions": {
     "enabled": true
-  },
-  "customManagers": [
-    {
-      "customType": "regex",
-      "managerFilePatterns": [
-        "//custom_components/openwrt/helpers/mqtt_presence.py//"
-      ],
-      "matchStrings": ["# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+REPO_URL = \"https://raw.githubusercontent.com/[^/]+/[^/]+/(?<currentDigest>[a-f0-9]+)\""],
-      "currentValueTemplate": "main"
-    }
-  ]
+  }
 }

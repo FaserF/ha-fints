@@ -50,7 +50,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          uv pip install --system ruff mypy pyyaml pytest pytest-asyncio pytest-cov pytest-xdist homeassistant paramiko aiohttp pytest-homeassistant-custom-component
+          uv pip install --system ruff mypy pyyaml pytest pytest-asyncio pytest-cov pytest-xdist homeassistant paramiko aiohttp pytest-homeassistant-custom-component fints mt-940
 
       - name: Validate JSON/YAML
         run: |

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/FaserF/ha-fints/main/custom_components/fints/brand/logo.png" alt="FinTS Banking Logo" width="360">
+</p>
+
 # FinTS Banking (Enhanced) for Home Assistant
 
 [![GitHub Release](https://img.shields.io/github/release/FaserF/ha-fints.svg?style=flat-square)](https://github.com/FaserF/ha-fints/releases)
@@ -10,17 +14,13 @@ A secure, privacy-focused Home Assistant integration for German and Austrian onl
 
 ---
 
-## 🧭 Table of Contents
+## 🧭 Quick Links
 
-- [✨ Features](#-features)
-- [🏦 Supported Banks](#-supported-banks)
-- [📦 Installation](#-installation)
-- [⚙️ Configuration](#️-configuration)
-- [📊 Entities](#-entities)
-- [🧱 Services](#-services)
-- [🔒 Security & Privacy](#-security--privacy)
-- [🤖 Automation Examples](#-automation-examples)
-- [🛠️ Troubleshooting](#️-troubleshooting)
+| | | | |
+| :--- | :--- | :--- | :--- |
+| [✨ Features](#-features) | [🏦 Supported Banks](#-supported-banks) | [📦 Installation](#-installation) | [⚙️ Configuration](#️-configuration) |
+| [🛡️ Security](SECURITY.md) | [📊 Entities](#-entities) | [🧱 Services](#-services) | [🤖 Automations](#-automation-examples) |
+| [❓ Troubleshooting](#️-troubleshooting) | [🧑‍💻 Development](AGENTS.md) | [💖 Sponsors](.github/FUNDING.yml) | [📄 License](LICENSE) |
 
 ---
 

@@ -1,5 +1,5 @@
 name: Feature Request
-description: Suggest an idea or enhancement for the OpenWrt Home Assistant integration
+description: Suggest an idea or enhancement for the FinTS Banking Home Assistant integration
 title: '[Feature]: '
 labels: ['enhancement', 'triage']
 assignees:
@@ -9,9 +9,8 @@ body:
     attributes:
       value: |
         ## Before submitting
-        - 🔍 Search [existing feature requests](https://github.com/FaserF/ha-openwrt/issues?q=label%3Aenhancement) to avoid duplicates
-        - 📖 Check the [Documentation Site](https://faserf.github.io/ha-openwrt/)
-        - 🔗 View the integration: [![Open your Home Assistant instance and show the openwrt integration.](https://my.home-assistant.io/badges/integration.svg)](https://my.home-assistant.io/redirect/integration/?domain=openwrt)
+        - 🔍 Search [existing feature requests](https://github.com/FaserF/ha-fints/issues?q=label%3Aenhancement) to avoid duplicates
+        - 🔗 View the integration: [![Open your Home Assistant instance and show the fints integration.](https://my.home-assistant.io/badges/integration.svg)](https://my.home-assistant.io/redirect/integration/?domain=fints)
 
   - type: textarea
     id: problem
@@ -36,12 +35,12 @@ body:
       label: Feature Area
       description: Which area of the integration does this feature relate to?
       options:
-        - Connected clients tracking
-        - Traffic / bandwidth monitoring
-        - Router resource monitoring (CPU/RAM)
-        - VPN / WireGuard support
-        - Firewall / rule management
-        - Configuration / options
+        - Account balance tracking
+        - Transaction parsing & booking history
+        - Multi-account management
+        - Banking services & action calls
+        - TAN & two-factor authentication
+        - Polling interval & rate limiting
         - Other
     validations:
       required: true
