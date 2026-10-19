@@ -6,10 +6,10 @@ authors = [
     {name = "FaserF", email = "github@fabiseitz.de"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = "==3.15.0"
 dependencies = [
-    "fints>=4.0.0",
-    "mt-940>=4.3.0",
+    "fints==5.0.1",
+    "mt-940==5.1.1",
 ]
 
 [project.optional-dependencies]
