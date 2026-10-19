@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import json
 import logging
-from pathlib import Path
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -19,20 +17,20 @@ _CACHED_VERSION: str | None = None
 
 
 def get_integration_version(hass: HomeAssistant) -> str:
-    """Return the integration version, caching it in memory to avoid event-loop blocking disk I/O."""
+    """Return the integration version without blocking the event loop."""
     global _CACHED_VERSION
     if _CACHED_VERSION is not None:
         return _CACHED_VERSION
 
+    # Try HA integration manifest loader first (non-blocking)
     try:
-        manifest_path = Path(__file__).parent / "manifest.json"
-        if manifest_path.exists():
-            with open(manifest_path, encoding="utf-8") as f:
-                manifest_data = json.load(f)
-                _CACHED_VERSION = manifest_data.get("version", "1.0.0")
+        if hasattr(hass, "data") and "custom_components" in hass.data:
+            comp = hass.data["custom_components"].get(DOMAIN)
+            if comp and hasattr(comp, "manifest"):
+                _CACHED_VERSION = comp.manifest.get("version", "1.0.0")
                 return _CACHED_VERSION
-    except Exception as err:
-        _LOGGER.debug("Could not read manifest version: %s", err)
+    except Exception:
+        pass
 
     _CACHED_VERSION = "1.0.0"
     return _CACHED_VERSION
@@ -114,5 +112,5 @@ def get_account_device_info(
         manufacturer=manufacturer,
         model="Bank Account",
         sw_version=version,
-        via_device=(DOMAIN, entry.entry_id),
+        via_device_id=entry.entry_id,
     )
