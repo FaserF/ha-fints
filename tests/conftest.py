@@ -46,10 +46,14 @@ def mock_submodule(name: str) -> None:
         full_name = ".".join(parts[:i])
         if full_name not in sys.modules:
             mock = MagicMock()
+            mock.__path__ = []
             sys.modules[full_name] = mock
             if i > 1:
                 parent_name = ".".join(parts[: i - 1])
                 setattr(sys.modules[parent_name], parts[i - 1], mock)
+        else:
+            if not hasattr(sys.modules[full_name], "__path__"):
+                sys.modules[full_name].__path__ = []
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -253,9 +257,14 @@ mock_submodule("homeassistant.helpers.entity")
 mock_submodule("homeassistant.helpers.entity_platform")
 mock_submodule("homeassistant.helpers.config_validation")
 mock_submodule("homeassistant.helpers.device_registry")
+mock_submodule("homeassistant.helpers.typing")
 mock_submodule("homeassistant.components.sensor")
 mock_submodule("homeassistant.components.binary_sensor")
 mock_submodule("homeassistant.components.button")
+
+ha_typing = sys.modules["homeassistant.helpers.typing"]
+ha_typing.ConfigType = dict[str, Any]
+ha_typing.DiscoveryInfoType = dict[str, Any]
 
 ha_const = sys.modules["homeassistant.const"]
 ha_const.Platform = types.SimpleNamespace(
@@ -308,6 +317,9 @@ config_val = sys.modules["homeassistant.helpers.config_validation"]
 config_val.string = str
 config_val.date = lambda val: val
 config_val.positive_int = int
+config_val.PLATFORM_SCHEMA = MagicMock()
+config_val.PLATFORM_SCHEMA.extend = lambda schema, *args, **kwargs: schema
+config_val.ensure_list = lambda x: [x] if not isinstance(x, list) else x
 
 sensor_module = sys.modules["homeassistant.components.sensor"]
 
@@ -374,6 +386,7 @@ cfg_module.ConfigFlow = MockConfigFlow
 cfg_module.OptionsFlow = MockOptionsFlow
 cfg_module.ConfigEntry = MagicMock
 cfg_module.ConfigFlowResult = dict
+cfg_module.SOURCE_IMPORT = "import"
 
 
 @dataclass

@@ -129,3 +129,44 @@ async def test_options_flow(mock_config_entry):
     assert submit_result["type"] == "create_entry"
     assert submit_result["data"][CONF_SCAN_INTERVAL] == 7200
     assert submit_result["data"][CONF_TRANSACTION_DAYS] == 60
+
+
+async def test_config_flow_import_success(mock_hass):
+    """Test importing official HA FinTS YAML format."""
+    flow = FinTSConfigFlow()
+    flow.hass = mock_hass
+
+    yaml_input = {
+        "bank_identification_number": 50010517,
+        "username": "ing_user_123",
+        "pin": "secret_pin",
+        "url": "https://fints.ing.de/fints/",
+        "accounts": [
+            {
+                "account": "DE51500105175448220781",
+                "name": "ING Girokonto",
+            }
+        ],
+    }
+
+    with patch(
+        "custom_components.fints.config_flow.FinTSClient.async_connect_and_test",
+        AsyncMock(return_value=[]),
+    ):
+        result = await flow.async_step_import(yaml_input)
+        assert result["type"] == "create_entry"
+        assert result["title"] == "FinTS 50010517 (ing_user_123)"
+        assert result["data"][CONF_BANK_CODE] == "50010517"
+        assert result["data"][CONF_LOGIN] == "ing_user_123"
+        assert result["data"][CONF_SERVER] == "https://fints.ing.de/fints/"
+        assert result["data"]["account_names"]["DE51500105175448220781"] == "ING Girokonto"
+
+
+async def test_config_flow_import_missing_params(mock_hass):
+    """Test import aborts on missing parameters."""
+    flow = FinTSConfigFlow()
+    flow.hass = mock_hass
+
+    result = await flow.async_step_import({"username": "user"})
+    assert result["type"] == "abort"
+    assert result["reason"] == "missing_parameters"

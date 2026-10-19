@@ -1,8 +1,9 @@
 """Test component setup and unload in ha-fints."""
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from custom_components.fints import (
+    async_setup,
     async_setup_entry,
     async_unload_entry,
     async_update_listener,
@@ -53,3 +54,21 @@ async def test_update_listener(mock_hass, mock_config_entry):
     mock_hass.config_entries.async_reload.assert_called_once_with(
         mock_config_entry.entry_id
     )
+
+
+async def test_async_setup_yaml(mock_hass):
+    """Test YAML setup imports configuration."""
+    mock_hass.async_create_task = MagicMock()
+    result = await async_setup(
+        mock_hass,
+        {
+            DOMAIN: {
+                "bank_code": "50010517",
+                "login": "user",
+                "pin": "pass",
+                "server": "https://...",
+            }
+        },
+    )
+    assert result is True
+    assert mock_hass.async_create_task.called

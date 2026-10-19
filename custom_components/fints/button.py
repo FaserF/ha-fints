@@ -44,6 +44,11 @@ class FinTSSyncButton(CoordinatorEntity[FinTSDataUpdateCoordinator], ButtonEntit
         self._attr_name = "Sync Bank Data"
         self._attr_device_info = get_bank_device_info(entry, version)
 
+    @property
+    def available(self) -> bool:
+        """Return True if button is available."""
+        return True
+
     async def async_press(self) -> None:
         """Handle button press to refresh data."""
         await self.coordinator.async_request_refresh()

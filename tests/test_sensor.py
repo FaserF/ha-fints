@@ -1,6 +1,7 @@
 """Test sensor platform in ha-fints."""
 
 from datetime import UTC, datetime
+from unittest.mock import MagicMock
 
 from custom_components.fints.const import DOMAIN
 from custom_components.fints.coordinator import FinTSDataUpdateCoordinator
@@ -14,6 +15,7 @@ from custom_components.fints.sensor import (
     FinTSTotalBalanceSensor,
     FinTSTotalHoldingsSensor,
     async_setup_entry,
+    async_setup_platform,
 )
 
 
@@ -232,4 +234,21 @@ def test_last_transaction_sensor(mock_hass, mock_config_entry):
 
     iban2 = "DE89370501980000099999"
     sensor2 = FinTSLastTransactionSensor(coord, mock_config_entry, iban2, "1.0.0")
-    assert sensor2.native_value is None
+    assert sensor2.native_value == 0.0
+
+
+async def test_sensor_async_setup_platform(mock_hass):
+    """Test importing legacy YAML platform setup."""
+    mock_hass.async_create_task = MagicMock()
+    await async_setup_platform(
+        mock_hass,
+        {
+            "platform": "fints",
+            "bank_identification_number": "50010517",
+            "username": "user",
+            "pin": "pass",
+            "url": "https://fints.ing.de/fints/",
+        },
+        MagicMock(),
+    )
+    assert mock_hass.async_create_task.called

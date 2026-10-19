@@ -28,7 +28,9 @@
     },
     "abort": {
       "already_configured": "This bank account / login is already configured.",
-      "reauth_successful": "Reauthentication was successful."
+      "reauth_successful": "Reauthentication was successful.",
+      "missing_parameters": "Missing required banking parameters for YAML import.",
+      "invalid_auth": "Invalid bank credentials or PIN rejected by the bank."
     }
   },
   "options": {

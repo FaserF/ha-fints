@@ -14,6 +14,7 @@ from homeassistant.helpers.update_coordinator import UpdateFailed
 from .client import FinTSClient
 from .const import (
     CONF_BANK_CODE,
+    CONF_BLZ,
     CONF_CUSTOMER_ID,
     CONF_LOGIN,
     CONF_PIN,
@@ -110,6 +111,94 @@ class FinTSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=schema,
             errors=errors,
+        )
+
+    async def async_step_import(
+        self, import_data: dict[str, Any]
+    ) -> config_entries.ConfigFlowResult:
+        """Import legacy configuration from YAML (including official HA fints schema)."""
+        bank_code = str(
+            import_data.get("bank_identification_number")
+            or import_data.get(CONF_BANK_CODE)
+            or import_data.get(CONF_BLZ)
+            or ""
+        ).strip()
+        login = str(
+            import_data.get("username")
+            or import_data.get(CONF_LOGIN)
+            or ""
+        ).strip()
+        pin = str(import_data.get(CONF_PIN) or "").strip()
+        server = str(
+            import_data.get("url")
+            or import_data.get(CONF_SERVER)
+            or ""
+        ).strip()
+        customer_id = import_data.get(CONF_CUSTOMER_ID)
+        if customer_id:
+            customer_id = str(customer_id).strip()
+        else:
+            customer_id = ""
+        product_id = str(
+            import_data.get(CONF_PRODUCT_ID) or DEFAULT_PRODUCT_ID
+        ).strip()
+
+        if not bank_code or not login or not pin or not server:
+            _LOGGER.error(
+                "Cannot import FinTS from YAML: missing required connection parameter(s)"
+            )
+            return self.async_abort(reason="missing_parameters")
+
+        unique_id = f"{bank_code}_{login}"
+        await self.async_set_unique_id(unique_id)
+        self._abort_if_unique_id_configured()
+
+        account_names: dict[str, str] = {}
+        for acc in import_data.get("accounts", []):
+            if isinstance(acc, dict) and "account" in acc:
+                acc_key = str(acc["account"]).replace(" ", "").upper()
+                acc_name = acc.get("name")
+                if acc_name:
+                    account_names[acc_key] = str(acc_name)
+
+        entry_data: dict[str, Any] = {
+            CONF_BANK_CODE: bank_code,
+            CONF_LOGIN: login,
+            CONF_PIN: pin,
+            CONF_SERVER: server,
+            CONF_CUSTOMER_ID: customer_id,
+            CONF_PRODUCT_ID: product_id,
+            "account_names": account_names,
+        }
+
+        client = FinTSClient(
+            hass=self.hass,
+            bank_code=bank_code,
+            login=login,
+            pin=pin,
+            server=server,
+            customer_id=customer_id,
+            product_id=product_id,
+        )
+
+        try:
+            await client.async_connect_and_test()
+        except ConfigEntryAuthFailed:
+            _LOGGER.error(
+                "FinTS YAML import failed: Invalid PIN / authentication rejected by bank %s for user %s",
+                bank_code,
+                login,
+            )
+            return self.async_abort(reason="invalid_auth")
+        except Exception as err:
+            _LOGGER.warning(
+                "FinTS YAML import could not verify connection immediately (%s); proceeding with entry creation so coordinator can manage authentication",
+                err,
+            )
+
+        return self.async_create_entry(
+            title=f"FinTS {bank_code} ({login})",
+            data=entry_data,
         )
 
     async def async_step_reauth(
