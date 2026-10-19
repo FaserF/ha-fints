@@ -106,7 +106,12 @@ Select **Configure** on the integration card to adjust:
 
 | Entity ID | Name | Description | Attributes |
 |---|---|---|---|
-| `sensor.total_bank_balance` | Total Bank Balance | Aggregated funds across all accounts | `account_count`, `bank_code`, `last_update` |
+| `sensor.total_bank_balance` | Total Bank Balance | Aggregated funds across cash accounts | `account_count`, `bank_code`, `bank_name`, `last_update` |
+| `sensor.total_depot_value` | Total Depot Value | Aggregated valuation across investment depots | `depot_count`, `bank_name`, `last_update` |
+| `sensor.bank_net_worth` | Bank Net Worth | Total net worth (liquid cash + securities) | `total_balance`, `total_holdings`, `bank_name` |
+| `sensor.bank_name` | Bank Name | Financial institution title & identifier | `bank_code`, `active_tan_mechanism` |
+| `sensor.active_tan_method` | Active TAN Method | Current two-factor authentication procedure | `available_tan_mechanisms` |
+| `sensor.holdings_<depot>` | Depot `<depot>` | Investment portfolio value & positions | `<name> total`, `<name> pieces`, `<name> price`, `isin`, `profit_loss`, `holdings` |
 | `sensor.balance_<masked_iban>` | Balance `<masked_iban>` | Account balance | `iban`, `bic`, `account_number`, `status`, `transaction_count` |
 | `sensor.last_transaction_<masked_iban>` | Last Transaction `<masked_iban>` | Value of last booking | `iban`, `date`, `purpose`, `applicant_name` |
 
@@ -149,6 +154,17 @@ data:
   end_date: "2026-01-31"
   limit: 20
 response_variable: recent_bookings
+```
+
+### `fints.get_holdings`
+
+Retrieves investment securities holdings for a depot account.
+
+```yaml
+action: fints.get_holdings
+data:
+  account: "1234567890" # Depot account number or IBAN
+response_variable: portfolio
 ```
 
 ---

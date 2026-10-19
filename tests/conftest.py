@@ -415,6 +415,20 @@ class MockTransaction:
     data: dict[str, Any]
 
 
+@dataclass
+class MockHolding:
+    """Mock Holding for depot tests."""
+
+    ISIN: str = "IE00B4L5Y983"
+    name: str = "iShares Core MSCI World"
+    pieces: float = 100.0
+    market_value: float = 85.50
+    total_value: float = 8550.0
+    value_symbol: str = "EUR"
+    valuation_date: Any = date(2026, 2, 1)
+    acquisitionprice: float = 75.00
+
+
 @pytest.fixture
 def mock_hass() -> MagicMock:
     """Fixture providing a mocked Home Assistant instance."""

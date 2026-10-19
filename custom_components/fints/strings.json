@@ -38,9 +38,51 @@
         "description": "Configure polling interval and advanced FinTS parameters.",
         "data": {
           "scan_interval": "Update Interval in seconds (minimum 1800s / 30m)",
+          "transaction_days": "Days of transaction history to fetch (default 30)",
           "product_id": "Custom FinTS Product ID",
           "tan_medium": "Selected TAN Medium / Mobile phone name"
         }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "account_balance": {
+        "name": "Balance"
+      },
+      "total_balance": {
+        "name": "Total Balance"
+      },
+      "total_holdings": {
+        "name": "Total Holdings"
+      },
+      "net_worth": {
+        "name": "Net Worth"
+      },
+      "bank_name": {
+        "name": "Bank Name"
+      },
+      "active_tan_mechanism": {
+        "name": "Active TAN Mechanism"
+      },
+      "holdings_account": {
+        "name": "Holdings Value"
+      },
+      "last_transaction": {
+        "name": "Last Transaction"
+      }
+    },
+    "binary_sensor": {
+      "connection": {
+        "name": "Connection"
+      },
+      "tan_required": {
+        "name": "TAN Required"
+      }
+    },
+    "button": {
+      "sync": {
+        "name": "Sync Now"
       }
     }
   },
@@ -78,6 +120,20 @@
         "limit": {
           "name": "Limit",
           "description": "Maximum number of transactions to return."
+        }
+      }
+    },
+    "get_holdings": {
+      "name": "Get Depot Holdings",
+      "description": "Fetch depot securities holdings for an investment/depot account via FinTS.",
+      "fields": {
+        "account": {
+          "name": "Account / Depot Number",
+          "description": "Target depot account number or IBAN."
+        },
+        "entry_id": {
+          "name": "Entry ID",
+          "description": "Optional config entry ID."
         }
       }
     }

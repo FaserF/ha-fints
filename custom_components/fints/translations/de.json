@@ -38,9 +38,51 @@
         "description": "Aktualisierungsintervall und erweiterte FinTS-Parameter konfigurieren.",
         "data": {
           "scan_interval": "Abfrageintervall in Sekunden (mindestens 1800s / 30 Min.)",
+          "transaction_days": "Tage der abzurufenden Umsatzhistorie (Standard 30)",
           "product_id": "Benutzerdefinierte FinTS-Produkt-ID",
           "tan_medium": "Gewähltes TAN-Medium / Mobiltelefonbezeichnung"
         }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "account_balance": {
+        "name": "Kontostand"
+      },
+      "total_balance": {
+        "name": "Gesamtsaldo"
+      },
+      "total_holdings": {
+        "name": "Depotgesamtwert"
+      },
+      "net_worth": {
+        "name": "Gesamtvermögen"
+      },
+      "bank_name": {
+        "name": "Bankinstitut"
+      },
+      "active_tan_mechanism": {
+        "name": "Aktives TAN-Verfahren"
+      },
+      "holdings_account": {
+        "name": "Depotwert"
+      },
+      "last_transaction": {
+        "name": "Letzte Buchung"
+      }
+    },
+    "binary_sensor": {
+      "connection": {
+        "name": "Verbindung"
+      },
+      "tan_required": {
+        "name": "TAN Erforderlich"
+      }
+    },
+    "button": {
+      "sync": {
+        "name": "Jetzt synchronisieren"
       }
     }
   },
@@ -78,6 +120,20 @@
         "limit": {
           "name": "Limit",
           "description": "Maximale Anzahl an zurückzugebenden Umsätzen."
+        }
+      }
+    },
+    "get_holdings": {
+      "name": "Wertpapierdepot abrufen",
+      "description": "Ruft Wertpapierbestände eines Depots über FinTS ab.",
+      "fields": {
+        "account": {
+          "name": "Konto- / Depotnummer",
+          "description": "Konto- oder Depotnummer bzw. IBAN."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Optionale Konfigurations-ID."
         }
       }
     }

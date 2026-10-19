@@ -20,8 +20,10 @@ from .const import (
     CONF_SCAN_INTERVAL,
     CONF_SERVER,
     CONF_TAN_MEDIUM,
+    CONF_TRANSACTION_DAYS,
     DEFAULT_PRODUCT_ID,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_TRANSACTION_DAYS,
     DOMAIN,
     MIN_SCAN_INTERVAL,
 )
@@ -62,6 +64,10 @@ class FinTSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             tan_medium=entry.options.get(
                 CONF_TAN_MEDIUM,
                 entry.data.get(CONF_TAN_MEDIUM),
+            ),
+            transaction_days=entry.options.get(
+                CONF_TRANSACTION_DAYS,
+                entry.data.get(CONF_TRANSACTION_DAYS, DEFAULT_TRANSACTION_DAYS),
             ),
         )
         self.last_update: datetime | None = None

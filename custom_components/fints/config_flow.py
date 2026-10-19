@@ -21,8 +21,10 @@ from .const import (
     CONF_SCAN_INTERVAL,
     CONF_SERVER,
     CONF_TAN_MEDIUM,
+    CONF_TRANSACTION_DAYS,
     DEFAULT_PRODUCT_ID,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_TRANSACTION_DAYS,
     DOMAIN,
     MIN_SCAN_INTERVAL,
 )
@@ -209,12 +211,21 @@ class FinTSOptionsFlowHandler(config_entries.OptionsFlow):
             self.config_entry.data.get(CONF_TAN_MEDIUM, ""),
         )
 
+        current_days = self.config_entry.options.get(
+            CONF_TRANSACTION_DAYS,
+            self.config_entry.data.get(CONF_TRANSACTION_DAYS, DEFAULT_TRANSACTION_DAYS),
+        )
+
         schema = vol.Schema(
             {
                 vol.Optional(
                     CONF_SCAN_INTERVAL,
                     default=max(current_interval, MIN_SCAN_INTERVAL),
                 ): vol.All(vol.Coerce(int), vol.Range(min=MIN_SCAN_INTERVAL)),
+                vol.Optional(
+                    CONF_TRANSACTION_DAYS,
+                    default=max(current_days, 1),
+                ): vol.All(vol.Coerce(int), vol.Range(min=1, max=365)),
                 vol.Optional(
                     CONF_PRODUCT_ID,
                     default=current_product_id,

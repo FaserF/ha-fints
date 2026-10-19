@@ -13,6 +13,7 @@ from custom_components.fints.const import (
     CONF_PRODUCT_ID,
     CONF_SCAN_INTERVAL,
     CONF_SERVER,
+    CONF_TRANSACTION_DAYS,
 )
 
 
@@ -121,8 +122,10 @@ async def test_options_flow(mock_config_entry):
 
     user_input = {
         CONF_SCAN_INTERVAL: 7200,
+        CONF_TRANSACTION_DAYS: 60,
         CONF_PRODUCT_ID: "CUSTOM_PRODUCT_ID",
     }
     submit_result = await flow.async_step_init(user_input)
     assert submit_result["type"] == "create_entry"
     assert submit_result["data"][CONF_SCAN_INTERVAL] == 7200
+    assert submit_result["data"][CONF_TRANSACTION_DAYS] == 60

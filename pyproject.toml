@@ -51,6 +51,9 @@ disable_error_code = ["misc", "call-arg", "import-untyped", "union-attr", "typed
 testpaths = [
     "tests",
 ]
+pythonpath = [
+    ".",
+]
 norecursedirs = [
     ".git",
     "testing_config",

@@ -45,3 +45,19 @@ get_transactions:
           min: 1
           max: 500
           mode: box
+
+get_holdings:
+  description: Fetch depot securities holdings for an investment/depot account via FinTS.
+  fields:
+    account:
+      description: Target depot account number or IBAN.
+      example: "1234567890"
+      required: true
+      selector:
+        text: {}
+    entry_id:
+      description: Optional config entry ID if multiple banks have identical account numbers.
+      example: "01JABCDEF1234567"
+      required: false
+      selector:
+        text: {}

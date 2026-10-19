@@ -5,7 +5,12 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from homeassistant.exceptions import HomeAssistantError
 
-from custom_components.fints.const import DOMAIN, SERVICE_GET_TRANSACTIONS, SERVICE_SYNC
+from custom_components.fints.const import (
+    DOMAIN,
+    SERVICE_GET_HOLDINGS,
+    SERVICE_GET_TRANSACTIONS,
+    SERVICE_SYNC,
+)
 from custom_components.fints.coordinator import FinTSDataUpdateCoordinator
 from custom_components.fints.services import async_setup_services, async_unload_services
 
@@ -74,8 +79,58 @@ async def test_services_get_transactions(mock_hass, mock_config_entry):
         await handlers[f"{DOMAIN}.{SERVICE_GET_TRANSACTIONS}"](call)
 
 
+async def test_services_get_holdings(mock_hass, mock_config_entry):
+    """Test fints.get_holdings service handling."""
+    coord = FinTSDataUpdateCoordinator(mock_hass, mock_config_entry)
+    depot_acc = "1234567890"
+    coord.data = {
+        "holdings_accounts": {
+            depot_acc: {
+                "account_number": depot_acc,
+                "total_value": 15000.0,
+                "holdings": [
+                    {
+                        "isin": "US0378331005",
+                        "name": "Apple Inc.",
+                        "total_value": 15000.0,
+                    }
+                ],
+            }
+        }
+    }
+    sample_holdings = [
+        {
+            "isin": "US0378331005",
+            "name": "Apple Inc.",
+            "pieces": 100.0,
+            "total_value": 15000.0,
+        }
+    ]
+    coord.client.async_get_holdings = AsyncMock(return_value=sample_holdings)
+    mock_hass.data[DOMAIN] = {mock_config_entry.entry_id: coord}
+
+    handlers = {}
+    mock_hass.services.async_register.side_effect = lambda d, s, h, **kw: (
+        handlers.update({f"{d}.{s}": h})
+    )
+
+    await async_setup_services(mock_hass)
+    assert f"{DOMAIN}.{SERVICE_GET_HOLDINGS}" in handlers
+
+    call = MagicMock()
+    call.data = {"account": depot_acc}
+    res = await handlers[f"{DOMAIN}.{SERVICE_GET_HOLDINGS}"](call)
+    assert res["count"] == 1
+    assert res["holdings"][0]["isin"] == "US0378331005"
+
+    # Test unknown account
+    call.data = {"account": "UNKNOWN999"}
+    with pytest.raises(HomeAssistantError):
+        await handlers[f"{DOMAIN}.{SERVICE_GET_HOLDINGS}"](call)
+
+
 async def test_services_unload(mock_hass):
     """Test unloading services."""
     mock_hass.data[DOMAIN] = {}
     await async_unload_services(mock_hass)
-    assert mock_hass.services.async_remove.call_count == 2
+    assert mock_hass.services.async_remove.call_count == 3

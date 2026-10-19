@@ -12,6 +12,21 @@
       },
       "available_amount": {
         "default": "mdi:credit-card-check"
+      },
+      "total_holdings": {
+        "default": "mdi:chart-line"
+      },
+      "net_worth": {
+        "default": "mdi:scale-balance"
+      },
+      "bank_name": {
+        "default": "mdi:domain"
+      },
+      "active_tan_mechanism": {
+        "default": "mdi:shield-key-outline"
+      },
+      "holdings_account": {
+        "default": "mdi:chart-pie"
       }
     },
     "binary_sensor": {
@@ -34,6 +49,9 @@
     },
     "get_transactions": {
       "service": "mdi:format-list-bulleted"
+    },
+    "get_holdings": {
+      "service": "mdi:chart-timeline-variant"
     }
   }
 }
