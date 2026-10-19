@@ -73,4 +73,4 @@ def test_device_info(mock_config_entry):
         "fints",
         f"{mock_config_entry.entry_id}_DE89370501980000012345",
     ) in acc_info["identifiers"]
-    assert acc_info["via_device_id"] == mock_config_entry.entry_id
+    assert acc_info["via_device"] == ("fints", mock_config_entry.entry_id)

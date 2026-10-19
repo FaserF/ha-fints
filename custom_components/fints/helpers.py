@@ -112,5 +112,5 @@ def get_account_device_info(
         manufacturer=manufacturer,
         model="Bank Account",
         sw_version=version,
-        via_device_id=entry.entry_id,
+        via_device=(DOMAIN, entry.entry_id),
     )

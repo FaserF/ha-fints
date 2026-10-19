@@ -156,7 +156,9 @@ class FinTSClient:
             )
 
             is_holding = False
-            if isinstance(acc_type, int) and 30 <= acc_type <= 39:
+            supported_ops = meta.get("supported_operations", {})
+            has_get_holdings = any(getattr(op, "name", str(op)) == "GET_HOLDINGS" and supp for op, supp in supported_ops.items())
+            if (isinstance(acc_type, int) and 30 <= acc_type <= 39) or has_get_holdings or "depot" in product_name.lower():
                 is_holding = True
 
             # If it's a holdings / investment portfolio account
