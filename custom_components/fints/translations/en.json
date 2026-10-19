@@ -3,7 +3,82 @@
     "step": {
       "user": {
         "title": "FinTS Banking Setup",
-        "description": "Enter bank details."
+        "description": "Enter your bank credentials and FinTS server URL.",
+        "data": {
+          "bank_code": "Bank Code (BLZ)",
+          "login": "Login / Username",
+          "pin": "PIN / Online Banking Password",
+          "server": "FinTS Server URL",
+          "customer_id": "Customer ID (Optional)",
+          "product_id": "FinTS Product ID (Optional)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate FinTS Banking",
+        "description": "The online banking credentials for user {login} at bank {bank_code} have expired or failed. Please enter the new PIN.",
+        "data": {
+          "pin": "New PIN / Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the FinTS server. Please verify the URL and network connection.",
+      "invalid_auth": "Invalid bank credentials or PIN rejected by the bank.",
+      "unknown": "An unexpected error occurred. Please check the logs."
+    },
+    "abort": {
+      "already_configured": "This bank account / login is already configured.",
+      "reauth_successful": "Reauthentication was successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "FinTS Banking Options",
+        "description": "Configure polling interval and advanced FinTS parameters.",
+        "data": {
+          "scan_interval": "Update Interval in seconds (minimum 1800s / 30m)",
+          "product_id": "Custom FinTS Product ID",
+          "tan_medium": "Selected TAN Medium / Mobile phone name"
+        }
+      }
+    }
+  },
+  "services": {
+    "sync": {
+      "name": "Sync Bank Data",
+      "description": "Trigger an immediate bank data synchronization for configured FinTS accounts.",
+      "fields": {
+        "entry_id": {
+          "name": "Entry ID",
+          "description": "Specific FinTS configuration entry ID to sync (defaults to all configured accounts)."
+        }
+      }
+    },
+    "get_transactions": {
+      "name": "Get Bank Transactions",
+      "description": "Fetch recent bank transactions for an account via FinTS with optional date filtering.",
+      "fields": {
+        "iban": {
+          "name": "IBAN",
+          "description": "Target account IBAN."
+        },
+        "entry_id": {
+          "name": "Entry ID",
+          "description": "Optional config entry ID."
+        },
+        "start_date": {
+          "name": "Start Date",
+          "description": "Filter transactions on or after this date (YYYY-MM-DD)."
+        },
+        "end_date": {
+          "name": "End Date",
+          "description": "Filter transactions on or before this date (YYYY-MM-DD)."
+        },
+        "limit": {
+          "name": "Limit",
+          "description": "Maximum number of transactions to return."
+        }
       }
     }
   }

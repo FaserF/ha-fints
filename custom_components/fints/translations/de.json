@@ -1,0 +1,85 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "FinTS Online-Banking Einrichtung",
+        "description": "Geben Sie Ihre Bankverbindung und die FinTS-Server-URL ein.",
+        "data": {
+          "bank_code": "Bankleitzahl (BLZ)",
+          "login": "Anmeldename / Legitimations-ID",
+          "pin": "PIN / Online-Banking Passwort",
+          "server": "FinTS-Server-URL (z. B. https://...)",
+          "customer_id": "Kundennummer (optional)",
+          "product_id": "FinTS Produkt-ID (optional)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "FinTS-Zugangsdaten erneuern",
+        "description": "Die Zugangsdaten für Benutzer {login} bei der Bank {bank_code} sind abgelaufen oder ungültig. Bitte geben Sie Ihre neue PIN ein.",
+        "data": {
+          "pin": "Neue PIN / Passwort"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum FinTS-Server fehlgeschlagen. Bitte prüfen Sie Server-URL und Netzwerk.",
+      "invalid_auth": "Ungültige Zugangsdaten oder falsche PIN von der Bank abgewiesen.",
+      "unknown": "Unerwarteter Fehler aufgetreten. Bitte prüfen Sie die Systemprotokolle."
+    },
+    "abort": {
+      "already_configured": "Dieses Bankkonto bzw. dieser Benutzer ist bereits eingerichtet.",
+      "reauth_successful": "Die erneute Authentifizierung war erfolgreich."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "FinTS-Banking Optionen",
+        "description": "Aktualisierungsintervall und erweiterte FinTS-Parameter konfigurieren.",
+        "data": {
+          "scan_interval": "Abfrageintervall in Sekunden (mindestens 1800s / 30 Min.)",
+          "product_id": "Benutzerdefinierte FinTS-Produkt-ID",
+          "tan_medium": "Gewähltes TAN-Medium / Mobiltelefonbezeichnung"
+        }
+      }
+    }
+  },
+  "services": {
+    "sync": {
+      "name": "Bankdaten synchronisieren",
+      "description": "Löst eine sofortige Synchronisierung der FinTS-Konten und Kontostände aus.",
+      "fields": {
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Spezifische FinTS-Konfiguration zum Synchronisieren (standardmäßig alle)."
+        }
+      }
+    },
+    "get_transactions": {
+      "name": "Umsätze abrufen",
+      "description": "Ruft aktuelle Bankbuchungen für ein Konto via FinTS ab.",
+      "fields": {
+        "iban": {
+          "name": "IBAN",
+          "description": "IBAN des abzufragenden Kontos."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Optionale Konfigurations-ID."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Buchungen ab diesem Datum filtern (JJJJ-MM-TT)."
+        },
+        "end_date": {
+          "name": "Enddatum",
+          "description": "Buchungen bis zu diesem Datum filtern (JJJJ-MM-TT)."
+        },
+        "limit": {
+          "name": "Limit",
+          "description": "Maximale Anzahl an zurückzugebenden Umsätzen."
+        }
+      }
+    }
+  }
+}

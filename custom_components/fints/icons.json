@@ -1,0 +1,39 @@
+{
+  "entity": {
+    "sensor": {
+      "account_balance": {
+        "default": "mdi:cash-multiple"
+      },
+      "total_balance": {
+        "default": "mdi:bank"
+      },
+      "last_transaction": {
+        "default": "mdi:swap-horizontal"
+      },
+      "available_amount": {
+        "default": "mdi:credit-card-check"
+      }
+    },
+    "binary_sensor": {
+      "connection": {
+        "default": "mdi:bank-check"
+      },
+      "tan_required": {
+        "default": "mdi:security"
+      }
+    },
+    "button": {
+      "sync": {
+        "default": "mdi:sync"
+      }
+    }
+  },
+  "services": {
+    "sync": {
+      "service": "mdi:sync"
+    },
+    "get_transactions": {
+      "service": "mdi:format-list-bulleted"
+    }
+  }
+}

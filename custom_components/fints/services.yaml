@@ -1,0 +1,47 @@
+sync:
+  description: Trigger an immediate bank data synchronization for configured FinTS accounts.
+  fields:
+    entry_id:
+      description: Specific FinTS configuration entry ID to sync (defaults to all configured accounts).
+      example: "01JABCDEF1234567"
+      required: false
+      selector:
+        text: {}
+
+get_transactions:
+  description: Fetch recent bank transactions for an account via FinTS with optional date filtering.
+  fields:
+    iban:
+      description: Target account IBAN.
+      example: "DE89370501980000012345"
+      required: true
+      selector:
+        text: {}
+    entry_id:
+      description: Optional config entry ID if multiple banks have identical IBANs.
+      example: "01JABCDEF1234567"
+      required: false
+      selector:
+        text: {}
+    start_date:
+      description: Filter transactions on or after this date.
+      example: "2026-01-01"
+      required: false
+      selector:
+        date: {}
+    end_date:
+      description: Filter transactions on or before this date.
+      example: "2026-01-31"
+      required: false
+      selector:
+        date: {}
+    limit:
+      description: Maximum number of transactions to return.
+      example: 25
+      default: 50
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 500
+          mode: box

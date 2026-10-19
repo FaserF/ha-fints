@@ -1,6 +1,6 @@
 {
-  "name": "OpenWrt",
+  "name": "FinTS Banking",
   "render_readme": true,
   "zip_release": true,
-  "filename": "openwrt.zip"
+  "filename": "fints.zip"
 }
