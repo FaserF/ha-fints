@@ -159,7 +159,9 @@ async def test_config_flow_import_success(mock_hass):
         assert result["data"][CONF_BANK_CODE] == "50010517"
         assert result["data"][CONF_LOGIN] == "ing_user_123"
         assert result["data"][CONF_SERVER] == "https://fints.ing.de/fints/"
-        assert result["data"]["account_names"]["DE51500105175448220781"] == "ING Girokonto"
+        assert (
+            result["data"]["account_names"]["DE51500105175448220781"] == "ING Girokonto"
+        )
 
 
 async def test_config_flow_import_missing_params(mock_hass):

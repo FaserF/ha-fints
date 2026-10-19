@@ -124,24 +124,18 @@ class FinTSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             or ""
         ).strip()
         login = str(
-            import_data.get("username")
-            or import_data.get(CONF_LOGIN)
-            or ""
+            import_data.get("username") or import_data.get(CONF_LOGIN) or ""
         ).strip()
         pin = str(import_data.get(CONF_PIN) or "").strip()
         server = str(
-            import_data.get("url")
-            or import_data.get(CONF_SERVER)
-            or ""
+            import_data.get("url") or import_data.get(CONF_SERVER) or ""
         ).strip()
         customer_id = import_data.get(CONF_CUSTOMER_ID)
         if customer_id:
             customer_id = str(customer_id).strip()
         else:
             customer_id = ""
-        product_id = str(
-            import_data.get(CONF_PRODUCT_ID) or DEFAULT_PRODUCT_ID
-        ).strip()
+        product_id = str(import_data.get(CONF_PRODUCT_ID) or DEFAULT_PRODUCT_ID).strip()
 
         if not bank_code or not login or not pin or not server:
             _LOGGER.error(

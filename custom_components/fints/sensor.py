@@ -12,7 +12,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry, SOURCE_IMPORT
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -414,10 +414,9 @@ class FinTSAccountBalanceSensor(
         )
         iban = account.get("iban", account_key)
         masked = mask_iban(iban)
-        custom_name = (
-            entry.data.get("account_names", {}).get(account_key)
-            or entry.options.get("account_names", {}).get(account_key)
-        )
+        custom_name = entry.data.get("account_names", {}).get(
+            account_key
+        ) or entry.options.get("account_names", {}).get(account_key)
         if custom_name:
             self._attr_name = custom_name
         else:
@@ -514,10 +513,9 @@ class FinTSHoldingsAccountSensor(
             else {}
         )
         acc_num = account.get("account_number") or depot_key
-        custom_name = (
-            entry.data.get("account_names", {}).get(depot_key)
-            or entry.options.get("account_names", {}).get(depot_key)
-        )
+        custom_name = entry.data.get("account_names", {}).get(
+            depot_key
+        ) or entry.options.get("account_names", {}).get(depot_key)
         if custom_name:
             self._attr_name = custom_name
         else:
@@ -622,10 +620,9 @@ class FinTSLastTransactionSensor(
         )
         iban = account.get("iban", account_key)
         masked = mask_iban(iban)
-        custom_name = (
-            entry.data.get("account_names", {}).get(account_key)
-            or entry.options.get("account_names", {}).get(account_key)
-        )
+        custom_name = entry.data.get("account_names", {}).get(
+            account_key
+        ) or entry.options.get("account_names", {}).get(account_key)
         if custom_name:
             self._attr_name = f"Last Transaction {custom_name}"
         else:
