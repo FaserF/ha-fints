@@ -10,8 +10,8 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/FaserF/ha-fints/issues",
   "requirements": [
-    "fints>=5.0.1",
-    "mt-940>=5.1.1"
+    "fints==5.0.1",
+    "mt-940==5.1.1"
   ],
   "version": "1.0.0"
 }
