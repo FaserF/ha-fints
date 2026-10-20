@@ -281,7 +281,8 @@ class FinTSOptionsFlowHandler(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
+        super().__init__()
+        self._config_entry = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -290,22 +291,24 @@ class FinTSOptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
-        current_interval = self.config_entry.options.get(
+        current_interval = self._config_entry.options.get(
             CONF_SCAN_INTERVAL,
-            self.config_entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+            self._config_entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
         )
-        current_product_id = self.config_entry.options.get(
+        current_product_id = self._config_entry.options.get(
             CONF_PRODUCT_ID,
-            self.config_entry.data.get(CONF_PRODUCT_ID, DEFAULT_PRODUCT_ID),
+            self._config_entry.data.get(CONF_PRODUCT_ID, DEFAULT_PRODUCT_ID),
         )
-        current_tan_medium = self.config_entry.options.get(
+        current_tan_medium = self._config_entry.options.get(
             CONF_TAN_MEDIUM,
-            self.config_entry.data.get(CONF_TAN_MEDIUM, ""),
+            self._config_entry.data.get(CONF_TAN_MEDIUM, ""),
         )
 
-        current_days = self.config_entry.options.get(
+        current_days = self._config_entry.options.get(
             CONF_TRANSACTION_DAYS,
-            self.config_entry.data.get(CONF_TRANSACTION_DAYS, DEFAULT_TRANSACTION_DAYS),
+            self._config_entry.data.get(
+                CONF_TRANSACTION_DAYS, DEFAULT_TRANSACTION_DAYS
+            ),
         )
 
         schema = vol.Schema(

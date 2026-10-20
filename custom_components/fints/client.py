@@ -70,7 +70,22 @@ class FinTSClient:
 
             def _timeout_post(*args: Any, **kwargs: Any) -> Any:
                 kwargs.setdefault("timeout", timeout)
-                return orig_post(*args, **kwargs)
+                resp = orig_post(*args, **kwargs)
+                content_type = resp.headers.get("Content-Type", "").lower()
+                if "text/html" in content_type:
+                    raw_text = resp.text.lower()
+                    if (
+                        "wartung" in raw_text
+                        or "entschuldigung" in raw_text
+                        or "störung" in raw_text
+                    ):
+                        raise FinTSConnectionError(
+                            "Bank server is temporarily unavailable (maintenance window / scheduled outage)"
+                        )
+                    raise FinTSConnectionError(
+                        f"Bank server returned unexpected HTML page instead of FinTS protocol (status {resp.status_code})"
+                    )
+                return resp
 
             client.connection.session.post = _timeout_post  # type: ignore[method-assign]
         return client
