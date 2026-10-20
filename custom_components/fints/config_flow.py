@@ -10,6 +10,11 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
 from homeassistant.helpers.update_coordinator import UpdateFailed
+from homeassistant.helpers.selector import (
+    TextSelector,
+    TextSelectorConfig,
+    TextSelectorType,
+)
 
 from .client import FinTSClient
 from .const import (
@@ -100,7 +105,9 @@ class FinTSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             {
                 vol.Required(CONF_BANK_CODE): str,
                 vol.Required(CONF_LOGIN): str,
-                vol.Required(CONF_PIN): str,
+                vol.Required(CONF_PIN): TextSelector(
+                    TextSelectorConfig(type=TextSelectorType.PASSWORD)
+                ),
                 vol.Required(CONF_SERVER): str,
                 vol.Optional(CONF_CUSTOMER_ID): str,
                 vol.Optional(CONF_PRODUCT_ID, default=DEFAULT_PRODUCT_ID): str,
@@ -244,7 +251,9 @@ class FinTSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         schema = vol.Schema(
             {
-                vol.Required(CONF_PIN): str,
+                vol.Required(CONF_PIN): TextSelector(
+                    TextSelectorConfig(type=TextSelectorType.PASSWORD)
+                ),
             }
         )
 

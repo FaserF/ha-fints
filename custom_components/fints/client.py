@@ -53,9 +53,9 @@ class FinTSClient:
         self._client_datablob: bytes | None = None
         self._last_call_timestamp: float = 0.0
 
-    def _create_raw_client(self) -> FinTS3PinTanClient:
-        """Instantiate raw synchronous FinTS3PinTanClient with cached BPD/UPD data if available."""
-        return FinTS3PinTanClient(
+    def _create_raw_client(self, timeout: int = 15) -> FinTS3PinTanClient:
+        """Instantiate raw synchronous FinTS3PinTanClient with cached BPD/UPD data and request timeout."""
+        client = FinTS3PinTanClient(
             bank_identifier=self.bank_code,
             user_id=self.login,
             pin=self.pin,
@@ -65,6 +65,15 @@ class FinTSClient:
             tan_medium=self.tan_medium,
             from_data=self._client_datablob,
         )
+        if hasattr(client, "connection") and hasattr(client.connection, "session"):
+            orig_post = client.connection.session.post
+
+            def _timeout_post(*args: Any, **kwargs: Any) -> Any:
+                kwargs.setdefault("timeout", timeout)
+                return orig_post(*args, **kwargs)
+
+            client.connection.session.post = _timeout_post  # type: ignore[method-assign]
+        return client
 
     def _sync_connect_and_test(self) -> list[Any]:
         """Test connection and credentials synchronously."""

@@ -257,6 +257,7 @@ mock_submodule("homeassistant.helpers.entity")
 mock_submodule("homeassistant.helpers.entity_platform")
 mock_submodule("homeassistant.helpers.config_validation")
 mock_submodule("homeassistant.helpers.device_registry")
+mock_submodule("homeassistant.helpers.selector")
 mock_submodule("homeassistant.helpers.typing")
 mock_submodule("homeassistant.components.sensor")
 mock_submodule("homeassistant.components.binary_sensor")
@@ -542,3 +543,9 @@ def mock_fints_client() -> MagicMock:
     ]
 
     return raw
+
+selector_mod = sys.modules["homeassistant.helpers.selector"]
+selector_mod.TextSelector = lambda *args, **kwargs: MagicMock()
+selector_mod.TextSelectorConfig = lambda *args, **kwargs: MagicMock()
+selector_mod.TextSelectorType = MagicMock()
+selector_mod.TextSelectorType.PASSWORD = "password"
