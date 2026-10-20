@@ -70,3 +70,4 @@ release_body.md
 CHANGELOG_BODY.md
 updated_draft_body.md
 *.zip
+apply_standing_dialog.py

@@ -50,9 +50,11 @@ class FinTSClient:
         self.product_id = product_id or DEFAULT_PRODUCT_ID
         self.tan_medium = tan_medium
         self.transaction_days = max(transaction_days, 1)
+        self._client_datablob: bytes | None = None
+        self._last_call_timestamp: float = 0.0
 
     def _create_raw_client(self) -> FinTS3PinTanClient:
-        """Instantiate raw synchronous FinTS3PinTanClient."""
+        """Instantiate raw synchronous FinTS3PinTanClient with cached BPD/UPD data if available."""
         return FinTS3PinTanClient(
             bank_identifier=self.bank_code,
             user_id=self.login,
@@ -61,6 +63,7 @@ class FinTSClient:
             customer_id=self.customer_id,
             product_id=self.product_id,
             tan_medium=self.tan_medium,
+            from_data=self._client_datablob,
         )
 
     def _sync_connect_and_test(self) -> list[Any]:
@@ -91,9 +94,10 @@ class FinTSClient:
             raise HomeAssistantError(f"Unexpected FinTS error: {err}") from err
 
     def _sync_fetch_all_data(self) -> dict[str, Any]:
-        """Fetch all accounts, balances, holdings, and transactions synchronously."""
+        """Fetch all accounts, balances, holdings, and transactions synchronously inside a single standing dialog."""
         client = self._create_raw_client()
-        sepa_accounts = client.get_sepa_accounts()
+        with client:
+            sepa_accounts = client.get_sepa_accounts()
 
         # Retrieve comprehensive bank and account info from BPD/UPD
         bank_info: dict[str, Any] = {}
@@ -374,6 +378,11 @@ class FinTSClient:
             if isinstance(tan_mechanisms, dict)
             else []
         )
+
+        try:
+            self._client_datablob = client.deconstruct(including_private=True)
+        except Exception as blob_err:
+            _LOGGER.debug("Could not deconstruct FinTS client state: %s", blob_err)
 
         return {
             "bank_code": self.bank_code,
