@@ -9,12 +9,12 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
-from homeassistant.helpers.update_coordinator import UpdateFailed
 from homeassistant.helpers.selector import (
     TextSelector,
     TextSelectorConfig,
     TextSelectorType,
 )
+from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from .client import FinTSClient
 from .const import (

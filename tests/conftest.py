@@ -544,6 +544,7 @@ def mock_fints_client() -> MagicMock:
 
     return raw
 
+
 selector_mod = sys.modules["homeassistant.helpers.selector"]
 selector_mod.TextSelector = lambda *args, **kwargs: MagicMock()
 selector_mod.TextSelectorConfig = lambda *args, **kwargs: MagicMock()
