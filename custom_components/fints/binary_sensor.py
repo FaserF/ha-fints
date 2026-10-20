@@ -57,6 +57,11 @@ class FinTSConnectionBinarySensor(
         self._attr_device_info = get_bank_device_info(entry, version)
 
     @property
+    def available(self) -> bool:
+        """Return True if coordinator has data."""
+        return self.coordinator.data is not None
+
+    @property
     def is_on(self) -> bool:
         """Return True if connection is healthy and last update succeeded."""
         if not self.coordinator.last_update_success:
@@ -100,6 +105,11 @@ class FinTSTanRequiredBinarySensor(
         self._attr_unique_id = f"{entry.entry_id}_tan_required"
         self._attr_name = "TAN Challenge Required"
         self._attr_device_info = get_bank_device_info(entry, version)
+
+    @property
+    def available(self) -> bool:
+        """Return True if coordinator has data."""
+        return self.coordinator.data is not None
 
     @property
     def is_on(self) -> bool:

@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
+import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
@@ -41,6 +45,14 @@ from .const import (
     ATTR_TOTAL_BALANCE,
     ATTR_TOTAL_HOLDINGS,
     ATTR_TRANSACTION_COUNT,
+    CONF_BANK_CODE,
+    CONF_BLZ,
+    CONF_CUSTOMER_ID,
+    CONF_LOGIN,
+    CONF_PIN,
+    CONF_PRODUCT_ID,
+    CONF_SERVER,
+    DEFAULT_PRODUCT_ID,
     DOMAIN,
 )
 from .coordinator import FinTSDataUpdateCoordinator
@@ -50,6 +62,43 @@ from .helpers import (
     get_integration_version,
     mask_iban,
 )
+
+_LOGGER = logging.getLogger(__name__)
+
+PLATFORM_SCHEMA = cv.PLATFORM_SCHEMA.extend(
+    {
+        vol.Required(
+            vol.Any("bank_identification_number", CONF_BANK_CODE, CONF_BLZ)
+        ): vol.Coerce(str),
+        vol.Required(vol.Any("username", CONF_LOGIN)): cv.string,
+        vol.Required(CONF_PIN): cv.string,
+        vol.Required(vol.Any("url", CONF_SERVER)): cv.string,
+        vol.Optional(CONF_CUSTOMER_ID, default=""): cv.string,
+        vol.Optional(CONF_PRODUCT_ID, default=DEFAULT_PRODUCT_ID): cv.string,
+        vol.Optional("accounts"): vol.All(cv.ensure_list, [dict]),
+    },
+    extra=vol.ALLOW_EXTRA,
+)
+
+
+async def async_setup_platform(
+    hass: HomeAssistant,
+    config: ConfigType,
+    async_add_entities: AddEntitiesCallback,
+    discovery_info: DiscoveryInfoType | None = None,
+) -> None:
+    """Import legacy YAML platform configuration into a config entry."""
+    _LOGGER.warning(
+        "Loading FinTS via YAML sensor configuration is deprecated. "
+        "Migrating your configuration into an integration config entry automatically."
+    )
+    hass.async_create_task(
+        hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": SOURCE_IMPORT},
+            data=dict(config),
+        )
+    )
 
 
 async def async_setup_entry(
@@ -108,6 +157,11 @@ class FinTSTotalBalanceSensor(
         self._attr_device_info = get_bank_device_info(entry, version)
 
     @property
+    def available(self) -> bool:
+        """Return True if coordinator has data."""
+        return self.coordinator.data is not None
+
+    @property
     def native_value(self) -> float:
         """Return the total balance."""
         if not self.coordinator.data:
@@ -162,6 +216,11 @@ class FinTSTotalHoldingsSensor(
         self._attr_device_info = get_bank_device_info(entry, version)
 
     @property
+    def available(self) -> bool:
+        """Return True if coordinator has data."""
+        return self.coordinator.data is not None
+
+    @property
     def native_value(self) -> float:
         """Return cumulative depot valuation."""
         if not self.coordinator.data:
@@ -211,6 +270,11 @@ class FinTSNetWorthSensor(CoordinatorEntity[FinTSDataUpdateCoordinator], SensorE
         self._attr_device_info = get_bank_device_info(entry, version)
 
     @property
+    def available(self) -> bool:
+        """Return True if coordinator has data."""
+        return self.coordinator.data is not None
+
+    @property
     def native_value(self) -> float:
         """Return combined net worth."""
         if not self.coordinator.data:
@@ -253,6 +317,11 @@ class FinTSBankNameSensor(CoordinatorEntity[FinTSDataUpdateCoordinator], SensorE
         self._attr_device_info = get_bank_device_info(entry, version)
 
     @property
+    def available(self) -> bool:
+        """Return True if coordinator has data."""
+        return self.coordinator.data is not None
+
+    @property
     def native_value(self) -> str:
         """Return bank name."""
         if not self.coordinator.data:
@@ -291,6 +360,11 @@ class FinTSActiveTanMechanismSensor(
         self._attr_unique_id = f"{entry.entry_id}_active_tan"
         self._attr_name = "Active TAN Method"
         self._attr_device_info = get_bank_device_info(entry, version)
+
+    @property
+    def available(self) -> bool:
+        """Return True if coordinator has data."""
+        return self.coordinator.data is not None
 
     @property
     def native_value(self) -> str:
@@ -340,8 +414,14 @@ class FinTSAccountBalanceSensor(
         )
         iban = account.get("iban", account_key)
         masked = mask_iban(iban)
-        product_name = account.get("product_name") or "Account"
-        self._attr_name = f"{product_name} {masked}"
+        custom_name = entry.data.get("account_names", {}).get(
+            account_key
+        ) or entry.options.get("account_names", {}).get(account_key)
+        if custom_name:
+            self._attr_name = custom_name
+        else:
+            product_name = account.get("product_name") or "Account"
+            self._attr_name = f"{product_name} {masked}"
 
         self._attr_device_info = get_account_device_info(
             entry,
@@ -349,6 +429,14 @@ class FinTSAccountBalanceSensor(
             bic=account.get("bic"),
             bank_code=account.get("blz"),
             version=version,
+        )
+
+    @property
+    def available(self) -> bool:
+        """Return True if account exists in coordinator data."""
+        return (
+            self.coordinator.data is not None
+            and self.account_key in self.coordinator.data.get("accounts", {})
         )
 
     @property
@@ -425,8 +513,14 @@ class FinTSHoldingsAccountSensor(
             else {}
         )
         acc_num = account.get("account_number") or depot_key
-        prod = account.get("product_name") or "Depot"
-        self._attr_name = f"{prod} {acc_num}"
+        custom_name = entry.data.get("account_names", {}).get(
+            depot_key
+        ) or entry.options.get("account_names", {}).get(depot_key)
+        if custom_name:
+            self._attr_name = custom_name
+        else:
+            prod = account.get("product_name") or "Depot"
+            self._attr_name = f"{prod} {acc_num}"
 
         self._attr_device_info = get_account_device_info(
             entry,
@@ -434,6 +528,14 @@ class FinTSHoldingsAccountSensor(
             bic=account.get("bic"),
             bank_code=account.get("blz"),
             version=version,
+        )
+
+    @property
+    def available(self) -> bool:
+        """Return True if depot exists in coordinator data."""
+        return (
+            self.coordinator.data is not None
+            and self.depot_key in self.coordinator.data.get("holdings_accounts", {})
         )
 
     @property
@@ -518,7 +620,13 @@ class FinTSLastTransactionSensor(
         )
         iban = account.get("iban", account_key)
         masked = mask_iban(iban)
-        self._attr_name = f"Last Transaction {masked}"
+        custom_name = entry.data.get("account_names", {}).get(
+            account_key
+        ) or entry.options.get("account_names", {}).get(account_key)
+        if custom_name:
+            self._attr_name = f"Last Transaction {custom_name}"
+        else:
+            self._attr_name = f"Last Transaction {masked}"
 
         self._attr_device_info = get_account_device_info(
             entry,
@@ -526,6 +634,14 @@ class FinTSLastTransactionSensor(
             bic=account.get("bic"),
             bank_code=account.get("blz"),
             version=version,
+        )
+
+    @property
+    def available(self) -> bool:
+        """Return True if account exists in coordinator data."""
+        return (
+            self.coordinator.data is not None
+            and self.account_key in self.coordinator.data.get("accounts", {})
         )
 
     @property
@@ -541,19 +657,19 @@ class FinTSLastTransactionSensor(
         return self._account_data.get("last_transaction")
 
     @property
-    def native_value(self) -> float | None:
-        """Return the transaction amount."""
+    def native_value(self) -> float:
+        """Return the transaction amount (0.0 if none recorded)."""
         tx = self._last_tx
         if not tx:
-            return None
+            return 0.0
         return float(tx.get("amount", 0.0))
 
     @property
-    def native_unit_of_measurement(self) -> str | None:
+    def native_unit_of_measurement(self) -> str:
         """Return the transaction currency."""
         tx = self._last_tx
         if not tx:
-            return self._account_data.get("currency", "EUR")
+            return str(self._account_data.get("currency", "EUR"))
         return str(tx.get("currency", "EUR"))
 
     @property
@@ -562,7 +678,7 @@ class FinTSLastTransactionSensor(
         tx = self._last_tx or {}
         return {
             ATTR_IBAN: mask_iban(self._account_data.get("iban", self.account_key)),
-            ATTR_DATE: tx.get("date"),
-            ATTR_PURPOSE: tx.get("purpose"),
-            ATTR_APPLICANT_NAME: tx.get("applicant_name"),
+            ATTR_DATE: tx.get("date") or "None",
+            ATTR_PURPOSE: tx.get("purpose") or "None",
+            ATTR_APPLICANT_NAME: tx.get("applicant_name") or "None",
         }

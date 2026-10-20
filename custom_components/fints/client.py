@@ -50,10 +50,12 @@ class FinTSClient:
         self.product_id = product_id or DEFAULT_PRODUCT_ID
         self.tan_medium = tan_medium
         self.transaction_days = max(transaction_days, 1)
+        self._client_datablob: bytes | None = None
+        self._last_call_timestamp: float = 0.0
 
-    def _create_raw_client(self) -> FinTS3PinTanClient:
-        """Instantiate raw synchronous FinTS3PinTanClient."""
-        return FinTS3PinTanClient(
+    def _create_raw_client(self, timeout: int = 15) -> FinTS3PinTanClient:
+        """Instantiate raw synchronous FinTS3PinTanClient with cached BPD/UPD data and request timeout."""
+        client = FinTS3PinTanClient(
             bank_identifier=self.bank_code,
             user_id=self.login,
             pin=self.pin,
@@ -61,7 +63,32 @@ class FinTSClient:
             customer_id=self.customer_id,
             product_id=self.product_id,
             tan_medium=self.tan_medium,
+            from_data=self._client_datablob,
         )
+        if hasattr(client, "connection") and hasattr(client.connection, "session"):
+            orig_post = client.connection.session.post
+
+            def _timeout_post(*args: Any, **kwargs: Any) -> Any:
+                kwargs.setdefault("timeout", timeout)
+                resp = orig_post(*args, **kwargs)
+                content_type = resp.headers.get("Content-Type", "").lower()
+                if "text/html" in content_type:
+                    raw_text = resp.text.lower()
+                    if (
+                        "wartung" in raw_text
+                        or "entschuldigung" in raw_text
+                        or "störung" in raw_text
+                    ):
+                        raise FinTSConnectionError(
+                            "Bank server is temporarily unavailable (maintenance window / scheduled outage)"
+                        )
+                    raise FinTSConnectionError(
+                        f"Bank server returned unexpected HTML page instead of FinTS protocol (status {resp.status_code})"
+                    )
+                return resp
+
+            client.connection.session.post = _timeout_post
+        return client
 
     def _sync_connect_and_test(self) -> list[Any]:
         """Test connection and credentials synchronously."""
@@ -91,9 +118,10 @@ class FinTSClient:
             raise HomeAssistantError(f"Unexpected FinTS error: {err}") from err
 
     def _sync_fetch_all_data(self) -> dict[str, Any]:
-        """Fetch all accounts, balances, holdings, and transactions synchronously."""
+        """Fetch all accounts, balances, holdings, and transactions synchronously inside a single standing dialog."""
         client = self._create_raw_client()
-        sepa_accounts = client.get_sepa_accounts()
+        with client:
+            sepa_accounts = client.get_sepa_accounts()
 
         # Retrieve comprehensive bank and account info from BPD/UPD
         bank_info: dict[str, Any] = {}
@@ -156,7 +184,16 @@ class FinTSClient:
             )
 
             is_holding = False
-            if isinstance(acc_type, int) and 30 <= acc_type <= 39:
+            supported_ops = meta.get("supported_operations", {})
+            has_get_holdings = any(
+                getattr(op, "name", str(op)) == "GET_HOLDINGS" and supp
+                for op, supp in supported_ops.items()
+            )
+            if (
+                (isinstance(acc_type, int) and 30 <= acc_type <= 39)
+                or has_get_holdings
+                or "depot" in product_name.lower()
+            ):
                 is_holding = True
 
             # If it's a holdings / investment portfolio account
@@ -365,6 +402,11 @@ class FinTSClient:
             if isinstance(tan_mechanisms, dict)
             else []
         )
+
+        try:
+            self._client_datablob = client.deconstruct(including_private=True)
+        except Exception as blob_err:
+            _LOGGER.debug("Could not deconstruct FinTS client state: %s", blob_err)
 
         return {
             "bank_code": self.bank_code,

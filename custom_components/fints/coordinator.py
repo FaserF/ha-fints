@@ -74,6 +74,14 @@ class FinTSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch the latest banking data from FinTS."""
-        data = await self.client.async_fetch_all_data()
+        new_data = await self.client.async_fetch_all_data()
         self.last_update = datetime.now(UTC)
-        return data
+        if new_data.get("tan_required") and self.data:
+            # Preserve existing accounts and balances during pending 2FA challenge
+            preserved = dict(self.data)
+            preserved["tan_required"] = True
+            preserved["last_update_success"] = False
+            if "auth" in new_data:
+                preserved["auth"] = new_data["auth"]
+            return preserved
+        return new_data

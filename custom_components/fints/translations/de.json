@@ -28,7 +28,9 @@
     },
     "abort": {
       "already_configured": "Dieses Bankkonto bzw. dieser Benutzer ist bereits eingerichtet.",
-      "reauth_successful": "Die erneute Authentifizierung war erfolgreich."
+      "reauth_successful": "Die erneute Authentifizierung war erfolgreich.",
+      "missing_parameters": "Erforderliche Bankparameter für den YAML-Import fehlen.",
+      "invalid_auth": "Ungültige Zugangsdaten oder falsche PIN von der Bank abgewiesen."
     }
   },
   "options": {
