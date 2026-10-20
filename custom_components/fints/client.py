@@ -87,7 +87,7 @@ class FinTSClient:
                     )
                 return resp
 
-            client.connection.session.post = _timeout_post  # type: ignore[method-assign]
+            client.connection.session.post = _timeout_post
         return client
 
     def _sync_connect_and_test(self) -> list[Any]:
