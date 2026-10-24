@@ -219,3 +219,12 @@ action:
 - **Rate Limiting / Account Lockout**: FinTS queries should not be run too frequently (never below 30 minutes). Banks automatically lock online access if polled too often.
 - **SCA / 90-Day PSD2 Reauthorization**: Under European PSD2 regulations, banks require strong customer authentication (TAN challenge) at least once every 90 days. When this occurs, `binary_sensor.tan_challenge_required` turns `on`.
 - **Diagnostics**: Export diagnostic logs via **Settings** > **Devices** > **FinTS** > **Download Diagnostics**. All sensitive credentials are automatically redacted.
+
+---
+
+## 🔌 Recommended Hardware & Ecosystem Links
+
+| Device / Service | Integration Use Case | Link |
+| :--- | :--- | :--- |
+| **Trade Republic (Zinsen & kostenlose ETF-Sparpläne)** | Kompatibel mit Home Assistant Depot- & Cashflow-Sensoren | [Offizielle Geräte-Seite →](https://fabiseitz.de/go/tr) |
+| **Finanzfluss Copilot Dashboard** | Automatische Konto-, Depot- & Freistellungsauftrag-Synchronisation | [Offizielle Geräte-Seite →](https://fabiseitz.de/go/finanzfluss) |
