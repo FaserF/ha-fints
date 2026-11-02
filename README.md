@@ -1,4 +1,4 @@
-<p align="center">
+﻿<p align="center">
   <img src="https://raw.githubusercontent.com/FaserF/ha-fints/main/custom_components/fints/brand/logo.png" alt="FinTS Banking Logo" width="360">
 </p>
 
@@ -7,7 +7,7 @@
 [![GitHub Release](https://img.shields.io/github/release/FaserF/ha-fints.svg?style=flat-square)](https://github.com/FaserF/ha-fints/releases)
 [![Downloads (Current release)](https://img.shields.io/github/downloads/FaserF/ha-fints/latest/fints.zip?label=Downloads%20(Current%20release)&style=flat-square)](https://github.com/FaserF/ha-fints/releases)
 [![License](https://img.shields.io/github/license/FaserF/ha-fints.svg?style=flat-square)](LICENSE)
-[![hacs](https://img.shields.io/badge/HACS-custom-orange.svg?style=flat-square)](https://hacs.xyz)
+[![Home Assistant Marketplace](https://img.shields.io/badge/Home_Assistant-Marketplace-41BDF5.svg?style=flat-square&logo=homeassistant&logoColor=white)](https://www.home-assistant.io)
 [![CI Orchestrator](https://github.com/FaserF/ha-fints/actions/workflows/ci-orchestrator.yml/badge.svg)](https://github.com/FaserF/ha-fints/actions/workflows/ci-orchestrator.yml)
 
 A secure, privacy-focused Home Assistant integration for German and Austrian online banking using the native **FinTS 3.0 / HBCI** standard. Connect directly to your bank without intermediaries or cloud aggregators.
@@ -226,5 +226,5 @@ action:
 
 | Device / Service | Integration Use Case | Link |
 | :--- | :--- | :--- |
-| **Trade Republic (Zinsen & kostenlose ETF-Sparpläne)** | Kompatibel mit Home Assistant Depot- & Cashflow-Sensoren | [Offizielle Geräte-Seite →](https://fabiseitz.de/go/tr) |
-| **Finanzfluss Copilot Dashboard** | Automatische Konto-, Depot- & Freistellungsauftrag-Synchronisation | [Offizielle Geräte-Seite →](https://fabiseitz.de/go/finanzfluss) |
+| **Trade Republic (Interest & Fee-free ETF Savings Plans)** | Compatible with Home Assistant portfolio & cashflow sensors | [Official Device Page →](https://fabiseitz.de/go/tr) |
+| **Finanzfluss Copilot Dashboard** | Automated account, portfolio & tax-allowance synchronization | [Official Device Page →](https://fabiseitz.de/go/finanzfluss) |
