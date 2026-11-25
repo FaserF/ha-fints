@@ -7,14 +7,10 @@
     ":dependencyDashboard"
   ],
   "rangeStrategy": "pin",
+  "ignoreDeps": [
+    "fints"
+  ],
   "packageRules": [
-    {
-      "description": "Home Assistant Core strictly pins fints==3.1.0; newer fints versions fail Hassfest validation",
-      "matchPackageNames": [
-        "fints"
-      ],
-      "enabled": false
-    },
     {
       "matchCategories": [
         "python"
@@ -25,6 +21,13 @@
       "matchUpdateTypes": ["minor", "patch"],
       "matchCurrentVersion": "!/^0/",
       "automerge": true
+    },
+    {
+      "description": "Home Assistant Core strictly pins fints==3.1.0; newer fints versions fail Hassfest validation",
+      "matchPackageNames": [
+        "fints"
+      ],
+      "enabled": false
     }
   ],
   "github-actions": {
