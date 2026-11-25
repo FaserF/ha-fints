@@ -38,6 +38,44 @@ if "voluptuous" not in sys.modules:
     vol_mock.Range = lambda **kwargs: kwargs
     sys.modules["voluptuous"] = vol_mock
 
+try:
+    import fints  # noqa: F401
+except ImportError:
+    fints_mod = types.ModuleType("fints")
+    fints_client_mod = types.ModuleType("fints.client")
+    fints_client_mod.FinTS3PinTanClient = MagicMock
+    fints_exc_mod = types.ModuleType("fints.exceptions")
+
+    class _MockFinTSError(Exception):
+        pass
+
+    class _MockFinTSClientPINError(_MockFinTSError):
+        pass
+
+    class _MockFinTSClientTemporaryAuthError(_MockFinTSError):
+        pass
+
+    class _MockFinTSConnectionError(_MockFinTSError):
+        pass
+
+    class _MockFinTSSCARequiredError(_MockFinTSError):
+        pass
+
+    class _MockFinTSUnsupportedOperation(_MockFinTSError):
+        pass
+
+    fints_exc_mod.FinTSError = _MockFinTSError
+    fints_exc_mod.FinTSClientPINError = _MockFinTSClientPINError
+    fints_exc_mod.FinTSClientTemporaryAuthError = _MockFinTSClientTemporaryAuthError
+    fints_exc_mod.FinTSConnectionError = _MockFinTSConnectionError
+    fints_exc_mod.FinTSSCARequiredError = _MockFinTSSCARequiredError
+    fints_exc_mod.FinTSUnsupportedOperation = _MockFinTSUnsupportedOperation
+    fints_mod.client = fints_client_mod
+    fints_mod.exceptions = fints_exc_mod
+    sys.modules["fints"] = fints_mod
+    sys.modules["fints.client"] = fints_client_mod
+    sys.modules["fints.exceptions"] = fints_exc_mod
+
 
 def mock_submodule(name: str) -> None:
     """Recursively mock submodules to ensure they are available in sys.modules."""
