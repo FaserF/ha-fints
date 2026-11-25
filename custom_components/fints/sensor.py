@@ -58,6 +58,7 @@ from .const import (
 from .coordinator import FinTSDataUpdateCoordinator
 from .helpers import (
     get_account_device_info,
+    get_bank_device_id,
     get_bank_device_info,
     get_integration_version,
     mask_iban,
@@ -423,12 +424,18 @@ class FinTSAccountBalanceSensor(
             product_name = account.get("product_name") or "Account"
             self._attr_name = f"{product_name} {masked}"
 
+        via_id = (
+            get_bank_device_id(coordinator.hass, entry, version)
+            if coordinator.hass is not None
+            else None
+        )
         self._attr_device_info = get_account_device_info(
             entry,
             iban=iban or account_key,
             bic=account.get("bic"),
             bank_code=account.get("blz"),
             version=version,
+            via_device_id=via_id,
         )
 
     @property
@@ -522,12 +529,18 @@ class FinTSHoldingsAccountSensor(
             prod = account.get("product_name") or "Depot"
             self._attr_name = f"{prod} {acc_num}"
 
+        via_id = (
+            get_bank_device_id(coordinator.hass, entry, version)
+            if coordinator.hass is not None
+            else None
+        )
         self._attr_device_info = get_account_device_info(
             entry,
             iban=account.get("iban") or depot_key,
             bic=account.get("bic"),
             bank_code=account.get("blz"),
             version=version,
+            via_device_id=via_id,
         )
 
     @property
@@ -628,12 +641,18 @@ class FinTSLastTransactionSensor(
         else:
             self._attr_name = f"Last Transaction {masked}"
 
+        via_id = (
+            get_bank_device_id(coordinator.hass, entry, version)
+            if coordinator.hass is not None
+            else None
+        )
         self._attr_device_info = get_account_device_info(
             entry,
             iban=iban or account_key,
             bic=account.get("bic"),
             bank_code=account.get("blz"),
             version=version,
+            via_device_id=via_id,
         )
 
     @property

@@ -7,6 +7,7 @@ from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import CONF_BANK_CODE, CONF_LOGIN, CONF_PIN, DOMAIN
@@ -96,21 +97,45 @@ def get_bank_device_info(entry: ConfigEntry, version: str) -> DeviceInfo:
     )
 
 
+def get_bank_device_id(hass: HomeAssistant, entry: ConfigEntry, version: str) -> str:
+    """Return the device registry ID of the parent FinTS bank gateway device."""
+    bank_info = get_bank_device_info(entry, version)
+    dev_reg = dr.async_get(hass)
+    device = dev_reg.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers=bank_info["identifiers"],
+        name=bank_info.get("name"),
+        manufacturer=bank_info.get("manufacturer"),
+        model=bank_info.get("model"),
+        sw_version=bank_info.get("sw_version"),
+    )
+    return device.id
+
+
 def get_account_device_info(
     entry: ConfigEntry,
     iban: str,
     bic: str | None,
     bank_code: str | None,
     version: str,
+    via_device_id: str | None = None,
 ) -> DeviceInfo:
     """Return DeviceInfo for a specific bank account."""
     masked = mask_iban(iban)
     manufacturer = bic or f"BLZ {bank_code}" if bank_code else "FinTS Banking"
+    if via_device_id is not None:
+        return DeviceInfo(
+            identifiers={(DOMAIN, f"{entry.entry_id}_{iban}")},
+            name=f"Account {masked}",
+            manufacturer=manufacturer,
+            model="Bank Account",
+            sw_version=version,
+            via_device_id=via_device_id,
+        )
     return DeviceInfo(
         identifiers={(DOMAIN, f"{entry.entry_id}_{iban}")},
         name=f"Account {masked}",
         manufacturer=manufacturer,
         model="Bank Account",
         sw_version=version,
-        via_device=(DOMAIN, entry.entry_id),
     )

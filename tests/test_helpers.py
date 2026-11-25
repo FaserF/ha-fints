@@ -68,9 +68,10 @@ def test_device_info(mock_config_entry):
         bic="COBADEFFXXX",
         bank_code="37050198",
         version="1.0.0",
+        via_device_id="bank_dev_123",
     )
     assert (
         "fints",
         f"{mock_config_entry.entry_id}_DE89370501980000012345",
     ) in acc_info["identifiers"]
-    assert acc_info["via_device"] == ("fints", mock_config_entry.entry_id)
+    assert acc_info["via_device_id"] == "bank_dev_123"
